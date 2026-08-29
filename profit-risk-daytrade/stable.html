@@ -6,133 +6,34 @@
 <title>Profit Risk — Controle Day Trade</title>
 <style>
 html,body{margin:0;background:#090d12;color:#eef3f7;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-.boot{min-height:100vh;display:grid;place-items:center}
-.box{padding:24px 28px;border:1px solid #202a35;background:#10161d;border-radius:12px;text-align:center}
-.box strong{display:block;font-size:18px;margin-bottom:8px}
-.box span{color:#7f8b98;font-size:12px}
-.err{color:#ff7b82!important;max-width:680px;display:block;margin-top:10px}
+.boot{min-height:100vh;display:grid;place-items:center}.box{padding:24px 28px;border:1px solid #202a35;background:#10161d;border-radius:12px;text-align:center}.box strong{display:block;font-size:18px;margin-bottom:8px}.box span{color:#7f8b98;font-size:12px}.err{color:#ff7b82!important;max-width:680px;display:block;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="boot"><div class="box"><strong>Profit Risk</strong><span id="status">Restaurando dashboard completo…</span></div></div>
+<div class="boot"><div class="box"><strong>Profit Risk</strong><span id="status">Carregando dashboard interativo…</span></div></div>
 <script>
 (async()=>{
   const status=document.getElementById('status');
   try{
-    const url='https://raw.githubusercontent.com/RealPedroSantos/shell-master/deploy-profit-risk-daytrade/profit-risk-daytrade/index.html?v=20260829-dashboard-restore-2';
-    const response=await fetch(url,{cache:'no-store'});
-    if(!response.ok)throw new Error('Falha ao carregar o dashboard: HTTP '+response.status);
-    let html=await response.text();
+    const base='https://raw.githubusercontent.com/RealPedroSantos/shell-master/deploy-profit-risk-daytrade/profit-risk-daytrade/';
+    const [pageResponse,runtimeResponse]=await Promise.all([
+      fetch(base+'index.html?v=20260829-richcharts-1',{cache:'no-store'}),
+      fetch(base+'runtime-enhancements.js?v=74764a5ad523301aeba4bac2a3ff6e6f168ac638',{cache:'no-store'})
+    ]);
+    if(!pageResponse.ok)throw new Error('Falha ao carregar o dashboard: HTTP '+pageResponse.status);
+    if(!runtimeResponse.ok)throw new Error('Falha ao carregar as interações: HTTP '+runtimeResponse.status);
+    let html=await pageResponse.text();
+    const runtime=await runtimeResponse.text();
     if(!html.includes('Profit Risk')||!html.includes('screen-dashboard'))throw new Error('Dashboard completo não foi reconhecido.');
+    if(!runtime.includes('pr-rich-tooltip'))throw new Error('Módulo interativo não foi reconhecido.');
 
     html=html.replace(
       '<p>A importação PDF será reativada após a estabilização desta versão.</p><button class="btn" disabled>Importação PDF temporariamente indisponível</button>',
       '<p>Importe o extrato consolidado da Warren em PDF. Saldo, aportes, retiradas, custos e ajustes de Day Trade serão reconhecidos automaticamente.</p><label class="filebtn primary">Importar extrato PDF<input id="warrenFile" type="file" accept=".pdf,application/pdf"></label>'
     );
 
-    const warrenCode=String.raw`
-function isoFromBRW(s){var p=String(s||'').split('/');return p.length===3?p[2]+'-'+p[1]+'-'+p[0]:''}
-function warrenClassW(description){var d=normalize(description);if(d.indexOf('ajustedaytradebmf')>=0)return'daytrade';if(d.indexOf('irrfsobredaytrade')>=0)return'irrf';if(d.indexOf('taxaderegistrobmf')>=0)return'fee_registration';if(d.indexOf('taxaemolumentosbmf')>=0)return'fee_emoluments';if(d.indexOf('cobrancadeprofit')>=0)return'platform';if(d.indexOf('depositopix')>=0||d.indexOf('tedrecebida')>=0||d.indexOf('transferenciarecebida')>=0)return'deposit';if(d.indexOf('tedenviada')>=0||d.indexOf('pixenviado')>=0||d.indexOf('saque')>=0)return'withdrawal';if(d.indexOf('investimentonofundo')>=0)return'investment_transfer';return'other'}
-function warrenTradeDateW(description,fallback){var m=String(description||'').match(/(?:dia\s+)?(\d{2}\/\d{2}\/\d{4})/i);return m?isoFromBRW(m[1]):fallback}
-function parseWarrenTextW(text){
-  var flat=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'\n');
-  var compact=flat.replace(/[ \t]+/g,' ');
-  var summary={initial:0,entries:0,exits:0,final:0};
-  function valueAfter(label){var re=new RegExp(label+'\\s+(?:Conta\\s+)?(-?R\\$\\s*[\\d.]+,\\d{2})','i'),m=compact.match(re);return m?parseNumber(m[1]):0}
-  summary.initial=valueAfter('Saldo inicial na conta');
-  summary.entries=valueAfter('Total de entradas');
-  summary.exits=Math.abs(valueAfter('Total de sa[ií]das'));
-  summary.final=valueAfter('Saldo final da conta no per[ií]odo');
-  var periodStart='',periodEnd='',pm=compact.match(/(\d{2}\/\d{2}\/\d{4})\s+[àa]\s+(\d{2}\/\d{2}\/\d{4})/i);
-  if(pm){periodStart=isoFromBRW(pm[1]);periodEnd=isoFromBRW(pm[2])}
-  var lines=flat.split(/\n+/).map(function(x){return x.replace(/\s+/g,' ').trim()}).filter(Boolean);
-  var tx=[],currentDate='',pending=[];
-  function header(line){return /^(Extrato de Conta|Data(?: Movimenta[cç][aã]o)?(?: Descri[cç][aã]o)?(?: Valor.*)?|Movimenta[cç][aã]o|Descri[cç][aã]o|Valor \(R\$\)|Resumo do per[ií]odo|Renascen[cç]a|CNPJ|Nome Completo|Banco|Ag[eê]ncia|Conta|CPF|Emiss[aã]o|Per[ií]odo)$/i.test(line)||/^\d{2}$/.test(line)}
-  function push(date,desc,value){
-    desc=String(desc||'').replace(/\bConta\b/gi,' ').replace(/\s+/g,' ').trim();
-    if(!desc)return;
-    var category=warrenClassW(desc),tradeDate=warrenTradeDateW(desc,date);
-    tx.push({id:'w-'+tx.length+'-'+date+'-'+normalize(desc)+'-'+Number(value).toFixed(2),date:date,description:desc,value:Number(value)||0,category:category,tradeDate:tradeDate})
-  }
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i];
-    if(header(line)){if(/^Extrato de Conta|^Data/i.test(line)){currentDate='';pending=[]}continue}
-    var direct=line.match(/^(\d{2}\/\d{2}\/\d{4})\b(.*)$/);
-    if(direct){
-      currentDate=isoFromBRW(direct[1]);
-      var rest=(direct[2]||'').trim();
-      var vals=[...rest.matchAll(/-?R\$\s*[\d.]+,\d{2}/g)];
-      if(vals.length){
-        var token=vals[vals.length-1][0],idx=rest.lastIndexOf(token),desc=rest.slice(0,idx).trim();
-        push(currentDate,desc,parseNumber(token));pending=[];currentDate='';continue
-      }
-      if(rest)pending=[rest];else pending=[];
-      continue
-    }
-    if(currentDate){
-      var onlyVals=[...line.matchAll(/-?R\$\s*[\d.]+,\d{2}/g)];
-      if(onlyVals.length){
-        var valueToken=onlyVals[onlyVals.length-1][0];
-        var before=line.slice(0,line.lastIndexOf(valueToken)).trim();
-        if(before&&!/^(Conta|NC|\d+)$/i.test(before))pending.push(before);
-        var desc2=pending.filter(function(x){return !/^(NC\s*)?\d+$/i.test(x)&&!/^Conta$/i.test(x)}).join(' ');
-        push(currentDate,desc2,parseNumber(valueToken));currentDate='';pending=[];continue
-      }
-      if(!/^\d{5,8}$/.test(line)&&!/^NC$/i.test(line))pending.push(line);
-      if(pending.length>5)pending=pending.slice(-5);
-    }
-  }
-  return{transactions:tx,summary:summary,periodStart:periodStart,periodEnd:periodEnd}
-}
-function loadPdfScriptW(src){return new Promise(function(resolve,reject){var s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;s.crossOrigin='anonymous';document.head.appendChild(s)})}
-async function ensurePdfJsW(){
-  if(window.pdfjsLib)return window.pdfjsLib;
-  var sources=['https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js','https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js'];
-  for(var i=0;i<sources.length;i++){try{await loadPdfScriptW(sources[i]);if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc=sources[i].replace('pdf.min.js','pdf.worker.min.js');return window.pdfjsLib}}catch(e){}}
-  throw new Error('Não foi possível carregar o leitor de PDF. Verifique a conexão e tente novamente.')
-}
-async function pdfTextW(file){
-  var lib=await ensurePdfJsW(),buf=await file.arrayBuffer(),pdf=await lib.getDocument({data:buf}).promise,pages=[];
-  for(var p=1;p<=pdf.numPages;p++){
-    var page=await pdf.getPage(p),content=await page.getTextContent(),items=content.items.map(function(i){return{s:i.str,x:i.transform[4],y:i.transform[5]}}),rows=[];
-    items.sort(function(a,b){return b.y-a.y||a.x-b.x});
-    items.forEach(function(it){var row=rows.find(function(r){return Math.abs(r.y-it.y)<2.2});if(!row){row={y:it.y,items:[]};rows.push(row)}row.items.push(it)});
-    rows.sort(function(a,b){return b.y-a.y});
-    pages.push(rows.map(function(r){return r.items.sort(function(a,b){return a.x-b.x}).map(function(i){return i.s}).join(' ')}).join('\n'))
-  }
-  return pages.join('\n')
-}
-async function importWarrenW(file){
-  try{
-    if(!file||!/\.pdf$/i.test(file.name))throw new Error('Selecione o extrato consolidado da Warren em PDF.');
-    el('warrenBadge').textContent='Processando';
-    el('warrenBadge').className='badge warn';
-    el('warrenMsg').className='notice';
-    el('warrenMsg').textContent='Lendo e classificando o extrato Warren…';
-    var parsed=parseWarrenTextW(await pdfTextW(file));
-    if(!parsed.transactions.length)throw new Error('Nenhuma movimentação da Warren foi reconhecida neste PDF.');
-    store.warren={
-      transactions:parsed.transactions,
-      summary:parsed.summary,
-      meta:{fileName:file.name,importedAt:new Date().toISOString(),periodStart:parsed.periodStart,periodEnd:parsed.periodEnd,movementCount:parsed.transactions.length}
-    };
-    saveStore();
-    el('warrenMsg').className='notice good';
-    el('warrenMsg').textContent=parsed.transactions.length+' movimentações importadas. Saldo final '+money(parsed.summary.final)+'.';
-    renderAll()
-  }catch(err){
-    el('warrenBadge').textContent='Erro';
-    el('warrenBadge').className='badge';
-    el('warrenMsg').className='notice bad';
-    el('warrenMsg').textContent=err.message
-  }
-}
-var warrenFileW=el('warrenFile');if(warrenFileW)warrenFileW.addEventListener('change',function(e){if(e.target.files&&e.target.files[0])importWarrenW(e.target.files[0])});
-`;
-    const marker='try{renderAll();var initial=';
-    if(!html.includes(marker))throw new Error('Ponto de inicialização do dashboard não encontrado.');
-    html=html.replace(marker,warrenCode+'\n'+marker);
-
+    const safeRuntime=runtime.replace(/<\/script/gi,'<\\/script');
+    html=html.replace('</body>','<script>'+safeRuntime+'<\/script></body>');
     document.open();
     document.write(html);
     document.close();
