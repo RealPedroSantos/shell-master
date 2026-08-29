@@ -16,16 +16,20 @@ html,body{margin:0;background:#090d12;color:#eef3f7;font-family:system-ui,-apple
   const status=document.getElementById('status');
   try{
     const base='https://raw.githubusercontent.com/RealPedroSantos/shell-master/deploy-profit-risk-daytrade/profit-risk-daytrade/';
-    const [pageResponse,runtimeResponse]=await Promise.all([
-      fetch(base+'index.html?v=20260829-richcharts-2',{cache:'no-store'}),
-      fetch(base+'runtime-enhancements.js?v=74764a5ad523301aeba4bac2a3ff6e6f168ac638',{cache:'no-store'})
+    const [pageResponse,runtimeResponse,tooltipFixResponse]=await Promise.all([
+      fetch(base+'index.html?v=20260829-richcharts-3',{cache:'no-store'}),
+      fetch(base+'runtime-enhancements.js?v=74764a5ad523301aeba4bac2a3ff6e6f168ac638',{cache:'no-store'}),
+      fetch(base+'tooltip-boundary-fix.js?v=6c7344a5ae0b015f80d3242e7c8cc4e31da9d887',{cache:'no-store'})
     ]);
     if(!pageResponse.ok)throw new Error('Falha ao carregar o dashboard: HTTP '+pageResponse.status);
     if(!runtimeResponse.ok)throw new Error('Falha ao carregar as interações: HTTP '+runtimeResponse.status);
+    if(!tooltipFixResponse.ok)throw new Error('Falha ao carregar a correção do tooltip: HTTP '+tooltipFixResponse.status);
     let html=await pageResponse.text();
     const runtime=await runtimeResponse.text();
+    const tooltipFix=await tooltipFixResponse.text();
     if(!html.includes('Profit Risk')||!html.includes('screen-dashboard'))throw new Error('Dashboard completo não foi reconhecido.');
     if(!runtime.includes('pr-rich-tooltip'))throw new Error('Módulo interativo não foi reconhecido.');
+    if(!tooltipFix.includes('boundaryFix'))throw new Error('Correção do tooltip não foi reconhecida.');
 
     html=html.replace(
       '<p>A importação PDF será reativada após a estabilização desta versão.</p><button class="btn" disabled>Importação PDF temporariamente indisponível</button>',
@@ -33,7 +37,8 @@ html,body{margin:0;background:#090d12;color:#eef3f7;font-family:system-ui,-apple
     );
 
     const safeRuntime=runtime.split('<'+'/script').join('<'+'\\/script');
-    html=html.replace('</body>','<script>'+safeRuntime+'<\/script></body>');
+    const safeTooltipFix=tooltipFix.split('<'+'/script').join('<'+'\\/script');
+    html=html.replace('</body>','<script>'+safeRuntime+'<\/script><script>'+safeTooltipFix+'<\/script></body>');
     document.open();
     document.write(html);
     document.close();
