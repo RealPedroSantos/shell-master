@@ -17,7 +17,7 @@ html,body{margin:0;background:#090d12;color:#eef3f7;font-family:system-ui,-apple
   try{
     const base='https://raw.githubusercontent.com/RealPedroSantos/shell-master/deploy-profit-risk-daytrade/profit-risk-daytrade/';
     const [pageResponse,runtimeResponse]=await Promise.all([
-      fetch(base+'index.html?v=20260829-richcharts-1',{cache:'no-store'}),
+      fetch(base+'index.html?v=20260829-richcharts-2',{cache:'no-store'}),
       fetch(base+'runtime-enhancements.js?v=74764a5ad523301aeba4bac2a3ff6e6f168ac638',{cache:'no-store'})
     ]);
     if(!pageResponse.ok)throw new Error('Falha ao carregar o dashboard: HTTP '+pageResponse.status);
@@ -32,7 +32,7 @@ html,body{margin:0;background:#090d12;color:#eef3f7;font-family:system-ui,-apple
       '<p>Importe o extrato consolidado da Warren em PDF. Saldo, aportes, retiradas, custos e ajustes de Day Trade serão reconhecidos automaticamente.</p><label class="filebtn primary">Importar extrato PDF<input id="warrenFile" type="file" accept=".pdf,application/pdf"></label>'
     );
 
-    const safeRuntime=runtime.replace(/<\/script/gi,'<\\/script');
+    const safeRuntime=runtime.split('<'+'/script').join('<'+'\\/script');
     html=html.replace('</body>','<script>'+safeRuntime+'<\/script></body>');
     document.open();
     document.write(html);
