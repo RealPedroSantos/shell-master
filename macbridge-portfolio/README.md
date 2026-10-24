@@ -8,15 +8,26 @@
   <code>SwiftUI</code> · <code>WKWebView</code> · <code>JavaScript</code> · <code>Shell/Zsh</code> · <code>AppleScript</code> · <code>Automação macOS</code>
 </p>
 
-![MacBridge — fluxo de uso](assets/01-flow.svg)
-
-> **Nota sobre as imagens:** os visuais abaixo são ilustrações técnicas do fluxo e da interface, baseadas no comportamento real do projeto. Não são apresentados como screenshots fotográficos da build atual. O aplicativo funcional é instalado como **MacBridge.app**; o target/projeto mantém internamente o nome histórico **MacBridge2**.
-
 ## Sobre o projeto
 
 **MacBridge** é um aplicativo nativo para macOS criado para transformar o ChatGPT Web em uma interface capaz de solicitar ações locais estruturadas no computador. O app mantém uma sessão web persistente, identifica comandos explicitamente marcados, executa apenas as classes de ações habilitadas e devolve o resultado da execução para a conversa.
 
 A proposta é reduzir a distância entre **conversar com uma IA** e **executar tarefas reais no Mac**, mantendo o usuário no controle das permissões e do protocolo utilizado.
+
+## Capturas reais do aplicativo
+
+Esta seção será preenchida exclusivamente com **screenshots reais da build atual instalada em `/Applications/MacBridge.app`**.
+
+Não são usados mockups, telas conceituais ou interfaces geradas por IA como representação do aplicativo real.
+
+As capturas planejadas para esta seção são:
+
+- janela principal do MacBridge em execução;
+- ChatGPT aberto dentro do aplicativo;
+- comando `macbridge` sendo reconhecido;
+- resultado de uma execução concluída;
+- captura de tela executada pelo próprio MacBridge;
+- painel de permissões/configurações, quando aplicável.
 
 ## O problema que ele resolve
 
@@ -44,26 +55,6 @@ Execution Engine
     ▼
 Resultado retornado ao ChatGPT
 ```
-
-## Demonstração visual
-
-### Ponte entre a conversa e o Mac
-
-![MacBridge — Chat e execução local](assets/01-flow.svg)
-
-O fluxo central combina a sessão do ChatGPT com status do sistema, histórico de comandos e ações locais. A intenção de design é permitir que o usuário acompanhe o que foi solicitado e o que foi realmente executado.
-
-### Painel de automação
-
-![MacBridge — painel de automação](assets/02-dashboard.svg)
-
-O painel reúne conexão, automação, captura de tela, acesso ao sistema e logs em uma visão única.
-
-### Central de comandos
-
-![MacBridge — central de comandos](assets/03-command-center.svg)
-
-A central de comandos representa o modelo operacional do projeto: comandos estruturados, status de execução, terminal/logs e atalhos para recursos do sistema.
 
 ## Principais recursos
 
