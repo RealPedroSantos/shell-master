@@ -27,11 +27,39 @@ Não é disponibilizada uma build antiga como se fosse a versão atual. Quando o
 
 A proposta é reduzir a distância entre **conversar com uma IA** e **executar tarefas reais no Mac**, mantendo o usuário no controle das permissões e do protocolo utilizado.
 
-## Capturas reais do aplicativo
+## Demonstração real do aplicativo
 
-Esta seção é reservada exclusivamente para **screenshots reais da build atual instalada em `/Applications/MacBridge.app`**.
+As imagens abaixo são capturas da **interface real do MacBridge**. Informações técnicas internas, identificadores de execução e conteúdo de logs foram ocultados nas imagens públicas quando necessário para preservar privacidade, sem alterar a interface apresentada.
 
-Não são usados mockups, telas conceituais ou interfaces geradas por IA como representação do aplicativo real.
+### Tela principal — ChatGPT integrado ao MacBridge
+
+![Tela principal real do MacBridge](assets/macbridge-home.webp)
+
+A tela principal reúne o ChatGPT, múltiplos chats/provedores, status do sistema, histórico recente de comandos e o controle de **Parada de Emergência**.
+
+### Execuções — comandos e resultados
+
+![Tela real de Execuções do MacBridge](assets/macbridge-execucoes.webp)
+
+O painel de **Execuções** permite acompanhar os comandos recebidos, estado da execução, duração e código de saída. Identificadores internos foram ocultados na imagem pública.
+
+### Logs — diagnóstico e auditoria local
+
+![Tela real de Logs do MacBridge com dados protegidos](assets/macbridge-logs-privacidade.webp)
+
+A área de **Logs** registra o ciclo de comunicação e execução do MacBridge. UUIDs, comandos detalhados, timestamps e outros identificadores técnicos foram borrados nesta demonstração pública.
+
+### Arquivos — leitura e gravação solicitadas pela conversa
+
+![Tela real de Arquivos do MacBridge](assets/macbridge-arquivos.webp)
+
+A área de **Arquivos** centraliza leituras e gravações solicitadas durante as conversas, permitindo que o usuário acompanhe operações de arquivo realizadas pelo bridge.
+
+### Permissões do macOS
+
+![Tela real de Permissões do MacBridge](assets/macbridge-permissoes.webp)
+
+O MacBridge apresenta de forma explícita o estado das permissões de **Acessibilidade**, **Gravação de Tela** e **Automação**, mantendo o usuário no controle dos recursos liberados ao aplicativo.
 
 ## O problema que ele resolve
 
