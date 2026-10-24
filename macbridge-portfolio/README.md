@@ -8,6 +8,19 @@
   <code>SwiftUI</code> · <code>WKWebView</code> · <code>JavaScript</code> · <code>Shell/Zsh</code> · <code>AppleScript</code> · <code>Automação macOS</code>
 </p>
 
+<p align="center">
+  <strong>Desenvolvido por <a href="https://github.com/RealPedroSantos">RealPedroSantos</a></strong><br/>
+  Pedro Santos
+</p>
+
+## Download
+
+O **instalador atual do MacBridge para macOS ainda não está publicado neste repositório**.
+
+Não é disponibilizada uma build antiga como se fosse a versão atual. Quando o `.dmg` da build atual for publicado, esta seção passará a oferecer o download direto do instalador.
+
+**Distribuição prevista:** `MacBridge.dmg` para macOS 14 ou superior.
+
 ## Sobre o projeto
 
 **MacBridge** é um aplicativo nativo para macOS criado para transformar o ChatGPT Web em uma interface capaz de solicitar ações locais estruturadas no computador. O app mantém uma sessão web persistente, identifica comandos explicitamente marcados, executa apenas as classes de ações habilitadas e devolve o resultado da execução para a conversa.
@@ -16,18 +29,9 @@ A proposta é reduzir a distância entre **conversar com uma IA** e **executar t
 
 ## Capturas reais do aplicativo
 
-Esta seção será preenchida exclusivamente com **screenshots reais da build atual instalada em `/Applications/MacBridge.app`**.
+Esta seção é reservada exclusivamente para **screenshots reais da build atual instalada em `/Applications/MacBridge.app`**.
 
 Não são usados mockups, telas conceituais ou interfaces geradas por IA como representação do aplicativo real.
-
-As capturas planejadas para esta seção são:
-
-- janela principal do MacBridge em execução;
-- ChatGPT aberto dentro do aplicativo;
-- comando `macbridge` sendo reconhecido;
-- resultado de uma execução concluída;
-- captura de tela executada pelo próprio MacBridge;
-- painel de permissões/configurações, quando aplicável.
 
 ## O problema que ele resolve
 
@@ -59,6 +63,7 @@ Resultado retornado ao ChatGPT
 ## Principais recursos
 
 - **Sessão persistente do ChatGPT Web** dentro de um `WKWebView`.
+- Suporte a múltiplos chats e provedores, incluindo ChatGPT e Gemini.
 - **Protocolo estruturado `macbridge`** para diferenciar texto normal de ações executáveis.
 - Execução de **Shell/Zsh** e **AppleScript**.
 - Abertura de aplicativos do macOS.
@@ -132,28 +137,15 @@ O projeto é desenvolvido em Swift/Xcode. O produto atual é instalado como:
 /Applications/MacBridge.app
 ```
 
-O projeto Xcode/target mantém o nome histórico `MacBridge2`. Para recursos de automação, o macOS pode solicitar permissões de **Acessibilidade** e **Gravação da Tela**.
+O código fonte atual está organizado como projeto Xcode e a interface utiliza SwiftUI. Para recursos de automação, o macOS pode solicitar permissões de **Acessibilidade**, **Gravação da Tela** e **Automação**.
 
-## O que este projeto demonstra
+## Autoria
 
-O MacBridge reúne competências de desenvolvimento que normalmente aparecem separadas:
-
-- desenvolvimento nativo para macOS com SwiftUI;
-- integração de conteúdo web em aplicativo nativo;
-- comunicação JavaScript ↔ Swift;
-- parsing de protocolo estruturado;
-- execução e supervisão de processos;
-- automação de sistema;
-- manipulação de arquivos e clipboard;
-- captura de tela;
-- controle de concorrência e deduplicação;
-- tratamento de permissões e segurança operacional;
-- design de interface para ferramentas técnicas.
-
-## Autor
-
+**Desenvolvido por RealPedroSantos**  
 **Pedro Santos**  
 GitHub: [@RealPedroSantos](https://github.com/RealPedroSantos)
+
+A identidade de autoria também deve permanecer registrada no aplicativo, na área **Sobre**, e no metadata/copyright do bundle macOS.
 
 ---
 
